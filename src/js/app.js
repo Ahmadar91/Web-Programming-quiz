@@ -4,11 +4,13 @@ function form (data) {
   const htmlBody = document.querySelector('body')
   const form = document.createElement('form')
   form.setAttribute('method', 'post')
+  form.setAttribute('action', obj.nextURL)
   const span = document.createElement('span')
   span.textContent = obj.question
   const br = document.createElement('br')
   const br1 = document.createElement('br')
   const button = document.createElement('button')
+  button.setAttribute('type', 'submit')
   button.textContent = 'Next Question'
   const input = document.createElement('input')
   input.setAttribute('type', 'text')
@@ -50,7 +52,7 @@ async function getQuestion (id) {
     })
 }
 
-async function postData (url = '', data = {}) {
+async function postData (url = '', data = { answer: '2' }) {
   // Default options are marked with *
   const response = await fetch(url, {
     method: 'POST', // *GET, POST, PUT, DELETE, etc.
