@@ -1,3 +1,4 @@
+// import fetch from 'node-fetch'
 
 function form (data) {
   const obj = data
@@ -20,18 +21,28 @@ function form (data) {
   form.appendChild(br1)
   form.appendChild(button)
   htmlBody.appendChild(form)
-  const answer = input.value
-  // postData(obj.nextURL, answer.json())
-  console.log('TCL: form -> answer.json()', answer.json())
+  const value = document.createElement('p')
+  value.setAttribute('id', 'values')
+  htmlBody.appendChild(value)
+
+  const result = {
+    answer: ''
+  }
+  console.log(result)
+  const log = document.getElementById('values')
+  input.addEventListener('input', updateValue)
+  console.log(obj.nextURL)
+  function updateValue (e) {
+    log.textContent = e.target.value
+    result.answer = e.target.value
+  }
   button.addEventListener('click', () => {
-    const answer = input.value
-    postData(obj.nextURL, answer.json())
-    console.log('TCL: form -> answer.json()', answer.json())
+    postData(obj.nextURL, result)
   })
 }
 
 async function getQuestion (id) {
-  await window.fetch(`http://vhost3.lnu.se:20080/question/${id}`, { mode: 'cors' })
+  await fetch(`http://vhost3.lnu.se:20080/question/${id}`, { mode: 'cors' })
     .then(
       function (res) {
         if (res.status !== 200) {
@@ -52,22 +63,21 @@ async function getQuestion (id) {
     })
 }
 
-async function postData (url = '', data = { answer: '2' }) {
-  // Default options are marked with *
-  const response = await fetch(url, {
-    method: 'POST', // *GET, POST, PUT, DELETE, etc.
-    mode: 'cors', // no-cors, *cors, same-origin
-    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-    credentials: 'same-origin', // include, *same-origin, omit
+async function postData (url, data = {}) {
+  await fetch(url, {
+    method: 'POST',
+    mode: 'cors',
     headers: {
       'Content-Type': 'application/json'
     },
-    redirect: 'follow', // manual, *follow, error
-    referrer: 'no-referrer', // no-referrer, *client
-    body: JSON.stringify(data) // body data type must match "Content-Type" header
+    body: JSON.stringify(data)
+  }).then(el => el.json()).then(data => {
+    const str = data.nextURL
+    const res = str.slice(36, str.length)
+    console.log(data)
+    console.log('TCL: postData -> res', res)
+    getQuestion(res)
   })
-  return response.json() // parses JSON response into native JavaScript objects
 }
-
 getQuestion(1)
-// postData()
+// postData('http://vhost3.lnu.se:20080/answer/1', { answer: '2' })
