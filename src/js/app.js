@@ -48,10 +48,31 @@ async function getQuestion (id) {
               alt.textContent = radioArray[index]
               label.setAttribute('for', 'alt' + [index + 1])
               label.textContent = radioArray[index]
+              console.log('TCL: getQuestion -> label', label)
               console.log('TCL: getQuestion -> alt', alt)
               divRadio.appendChild(alt)
               divRadio.append(label)
               divRadio.appendChild(br)
+            }
+            const altResult = {
+              answer: ''
+            }
+            const selectLabel = document.querySelectorAll('#radio label')
+            const selectAlt = document.querySelectorAll('#radio input')
+
+            for (let i = 0; i < selectLabel.length; i++) {
+              selectLabel[i].addEventListener('mouseover', () => {
+                selectLabel[i].classList.add('greenColor')
+              })
+              selectLabel[i].addEventListener('mouseout', () => {
+                selectLabel[i].classList.remove('greenColor')
+              })
+
+              selectLabel[i].addEventListener('click', () => {
+                altResult.answer = selectAlt[i].getAttribute('id')
+                console.log('TCL: getQuestion -> altResult.answer', altResult.answer)
+                postData(nextURL, altResult)
+              })
             }
           }
           return data
