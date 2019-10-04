@@ -43,10 +43,10 @@ async function getQuestion (id) {
               label = document.createElement('label')
               alt.setAttribute('type', 'radio')
               alt.setAttribute('name', 'alt')
-              alt.setAttribute('id', '' + radioArray[index])
+              alt.setAttribute('id', 'alt' + [index + 1])
               alt.setAttribute('value', '' + radioArray[index])
               alt.textContent = radioArray[index]
-              label.setAttribute('for', '' + radioArray[index])
+              label.setAttribute('for', 'alt' + [index + 1])
               label.textContent = radioArray[index]
               console.log('TCL: getQuestion -> alt', alt)
               divRadio.appendChild(alt)
