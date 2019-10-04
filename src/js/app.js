@@ -1,10 +1,26 @@
 
 // import fetch from 'node-fetch'
 
+/*
+variables
+*/
 const input = document.querySelector('#input')
 const button = document.querySelector('button')
 const questionSpan = document.querySelector('#question')
+const radioQuestion = document.createElement('input')
+const divRadio = document.querySelector('.radio')
+radioQuestion.setAttribute('type', 'radio')
+radioQuestion.setAttribute('name', 'alt')
+const label = document.createElement('label')
+const br = document.createElement('br')
 let nextURL = ''
+let newData = {
+
+}
+
+/*
+fetch the question to the the server
+*/
 async function getQuestion (id) {
   await fetch(`http://vhost3.lnu.se:20080/question/${id}`, { mode: 'cors' })
     .then(
@@ -19,6 +35,16 @@ async function getQuestion (id) {
           console.log(data)
           questionSpan.textContent = data.question
           nextURL = data.nextURL
+          newData = data
+          if (typeof (newData.alternatives) !== 'undefined') {
+            const radioArray = Object.values(newData.alternatives)
+            radioArray.forEach(element => {
+              label.textContent = element
+              divRadio.append(label)
+              divRadio.appendChild(radioQuestion)
+              divRadio.appendChild(br)
+            })
+          }
           return data
         })
       }
@@ -28,6 +54,9 @@ async function getQuestion (id) {
     })
 }
 
+/*
+post the question to the the server
+*/
 async function postData (url, data = {}) {
   await fetch(url, {
     method: 'POST',
@@ -44,9 +73,10 @@ async function postData (url, data = {}) {
     getQuestion(res)
   })
 }
-
+/*
+button submit
+*/
 button.addEventListener('click', () => {
-  // answer = input.value
   const result = {
     answer: ''
   }
