@@ -1,4 +1,3 @@
-// import { spawn } from 'child_process'
 
 // import fetch from 'node-fetch'
 // function form (data) {
@@ -44,6 +43,10 @@
 //   })
 // }
 
+const input = document.querySelector('#input')
+const button = document.querySelector('button')
+const questionSpan = document.querySelector('#question')
+let nextURL = ''
 async function getQuestion (id) {
   await fetch(`http://vhost3.lnu.se:20080/question/${id}`, { mode: 'cors' })
     .then(
@@ -56,7 +59,8 @@ async function getQuestion (id) {
         // Examine the text in the response
         res.json().then(function (data) {
           console.log(data)
-          form(data)
+          questionSpan.textContent = data.question
+          nextURL = data.nextURL
           return data
         })
       }
@@ -65,12 +69,6 @@ async function getQuestion (id) {
       console.log('Fetch Error :-S', err)
     })
 }
-
-// input.addEventListener('change', e => {
-//   show.textContent = e.value
-//   body.appendChild(show)
-//   console.log(show)
-// })
 
 async function postData (url, data = {}) {
   await fetch(url, {
@@ -89,19 +87,15 @@ async function postData (url, data = {}) {
   })
 }
 
-const input = document.querySelector('#input')
-let answer = ''
-const button = document.querySelector('button')
-const questionSpan = document.querySelector('#question')
-
-function form (data) {
-  button.addEventListener('click', () => {
-    answer = input.value
-    postData()
-    console.log('TCL: answer', answer)
-    questionSpan.textContent = getQuestion(1).nextURL
-  })
-}
+button.addEventListener('click', () => {
+  // answer = input.value
+  const result = {
+    answer: ''
+  }
+  result.answer = input.value
+  postData(nextURL, result)
+  console.log('TCL: answer', result)
+})
 
 getQuestion(1)
 // postData('http://vhost3.lnu.se:20080/answer/1', { answer: '2' })
