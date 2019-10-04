@@ -10,9 +10,9 @@ const questionSpan = document.querySelector('#question')
 const radioQuestion = document.createElement('input')
 const divRadio = document.querySelector('.radio')
 radioQuestion.setAttribute('type', 'radio')
+let alt
+let br
 radioQuestion.setAttribute('name', 'alt')
-const label = document.createElement('label')
-const br = document.createElement('br')
 let nextURL = ''
 let newData = {
 
@@ -38,12 +38,17 @@ async function getQuestion (id) {
           newData = data
           if (typeof (newData.alternatives) !== 'undefined') {
             const radioArray = Object.values(newData.alternatives)
-            radioArray.forEach(element => {
-              label.textContent = element
-              divRadio.append(label)
-              divRadio.appendChild(radioQuestion)
+            for (let index = 0; index < radioArray.length; index++) {
+              br = document.createElement('br')
+              alt = document.createElement('input')
+              alt.setAttribute('type', 'radio')
+              alt.setAttribute('name', 'alt')
+              alt.setAttribute('value', '' + radioArray[index])
+              alt.textContent = radioArray[index]
+              console.log('TCL: getQuestion -> alt', alt)
+              divRadio.appendChild(alt)
               divRadio.appendChild(br)
-            })
+            }
           }
           return data
         })
