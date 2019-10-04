@@ -80,6 +80,8 @@ async function postData (url, data = {}) {
     console.log(data)
     console.log('TCL: postData -> res', res)
     getQuestion(res)
+  }).catch(function (err) {
+    console.log('Fetch Error :-S', err)
   })
 }
 /*
