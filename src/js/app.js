@@ -95,4 +95,6 @@ button.addEventListener('click', () => {
 })
 
 getQuestion(1)
+
 // postData('http://vhost3.lnu.se:20080/answer/1', { answer: '2' })
+// postData('http://vhost3.lnu.se:20080/answer/21', { answer: 'alt3' })
