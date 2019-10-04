@@ -1,6 +1,4 @@
 
-// import fetch from 'node-fetch'
-
 /*
 variables
 */
@@ -8,10 +6,11 @@ const input = document.querySelector('#input')
 const button = document.querySelector('button')
 const questionSpan = document.querySelector('#question')
 const radioQuestion = document.createElement('input')
-const divRadio = document.querySelector('.radio')
+const divRadio = document.querySelector('#radio')
 radioQuestion.setAttribute('type', 'radio')
 let alt
 let br
+let label
 radioQuestion.setAttribute('name', 'alt')
 let nextURL = ''
 let newData = {
@@ -41,12 +40,17 @@ async function getQuestion (id) {
             for (let index = 0; index < radioArray.length; index++) {
               br = document.createElement('br')
               alt = document.createElement('input')
+              label = document.createElement('label')
               alt.setAttribute('type', 'radio')
               alt.setAttribute('name', 'alt')
+              alt.setAttribute('id', '' + radioArray[index])
               alt.setAttribute('value', '' + radioArray[index])
               alt.textContent = radioArray[index]
+              label.setAttribute('for', '' + radioArray[index])
+              label.textContent = radioArray[index]
               console.log('TCL: getQuestion -> alt', alt)
               divRadio.appendChild(alt)
+              divRadio.append(label)
               divRadio.appendChild(br)
             }
           }
