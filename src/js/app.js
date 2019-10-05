@@ -73,7 +73,7 @@ async function postData (url, data = {}) {
   }).then(el => el.json()).then(data => {
     const str = data.nextURL
     if (str == null) {
-      // endGame()
+      endGame()
       return
     }
     const res = str.slice(36, str.length)
@@ -85,19 +85,6 @@ async function postData (url, data = {}) {
     console.log('Fetch Error :-S', err)
   })
 }
-/*
-button submit
-*/
-// button.addEventListener('click', e => {
-//   const result = {
-//     answer: ''
-//   }
-//   result.answer = inputText.value
-//   postData(nextURL, result)
-//   e.preventDefault()
-//   removeTextInput()
-//   timeLeft = 20
-// })
 function altQuestions () {
   countdown()
   radioArray = Object.values(newData.alternatives)
@@ -182,6 +169,7 @@ function textQuestions () {
   })
 }
 function endGame () {
+  reset()
   console.log('Congrats you won')
   const gameOver = document.createElement('p')
   gameOver.textContent = 'Game Over you Lost'
@@ -250,3 +238,18 @@ function StartGame () {
 
 StartGame()
 // getQuestion(1)
+
+function reset () {
+  const message = document.createElement('h3')
+  message.textContent = 'click on the reset button to start again'
+  form.appendChild(message)
+  const resetButton = document.createElement('button')
+  resetButton.classList.add('button')
+  resetButton.textContent = 'Reset'
+  form.appendChild(resetButton)
+  resetButton.addEventListener('click', () => {
+    form.removeChild(resetButton)
+    form.removeChild(message)
+    StartGame()
+  })
+}
