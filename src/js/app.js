@@ -5,8 +5,6 @@ variables
 
 const inputText = document.createElement('input')
 const body = document.querySelector('body')
-// const input = document.querySelector('#input')
-const button = document.querySelector('button')
 const questionSpan = document.querySelector('#question')
 const radioQuestion = document.createElement('input')
 const form = document.querySelector('#form')
