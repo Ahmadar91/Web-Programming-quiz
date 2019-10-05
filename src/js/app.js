@@ -73,7 +73,7 @@ async function postData (url, data = {}) {
   }).then(el => el.json()).then(data => {
     const str = data.nextURL
     if (str == null) {
-      endGame()
+      // endGame()
       return
     }
     const res = str.slice(36, str.length)
@@ -88,16 +88,16 @@ async function postData (url, data = {}) {
 /*
 button submit
 */
-button.addEventListener('click', e => {
-  const result = {
-    answer: ''
-  }
-  result.answer = inputText.value
-  postData(nextURL, result)
-  e.preventDefault()
-  removeTextInput()
-  timeLeft = 20
-})
+// button.addEventListener('click', e => {
+//   const result = {
+//     answer: ''
+//   }
+//   result.answer = inputText.value
+//   postData(nextURL, result)
+//   e.preventDefault()
+//   removeTextInput()
+//   timeLeft = 20
+// })
 function altQuestions () {
   countdown()
   radioArray = Object.values(newData.alternatives)
@@ -121,7 +121,10 @@ function altQuestions () {
   }
   const selectLabel = document.querySelectorAll('#form label')
   const selectAlt = document.querySelectorAll('#form input[type=radio]')
-
+  const buttonAlt = document.createElement('button')
+  buttonAlt.classList.add('button')
+  buttonAlt.textContent = 'submit'
+  form.appendChild(buttonAlt)
   for (let i = 0; i < selectLabel.length; i++) {
     selectLabel[i].addEventListener('mouseover', () => {
       selectLabel[i].classList.add('greenColor')
@@ -133,7 +136,8 @@ function altQuestions () {
     selectAlt[i].addEventListener('click', () => {
       altResult.answer = selectAlt[i].getAttribute('id')
       console.log('TCL: altQuestions -> altResult.answer', altResult.answer)
-      button.addEventListener('click', e => {
+      // TODO:fix the post error from here
+      buttonAlt.addEventListener('click', e => {
         postData(nextURL, altResult)
         removeAltInput()
         timeLeft = 20
@@ -153,15 +157,29 @@ function removeAltInput () {
   }
 }
 
-function removeTextInput () {
-  form.removeChild(inputText)
-}
-
 function textQuestions () {
   countdown()
   inputText.setAttribute('type', 'text')
   const form = document.querySelector('#form')
   form.appendChild(inputText)
+  const buttonText = document.createElement('button')
+  const br = document.createElement('br')
+  buttonText.textContent = 'submit'
+  buttonText.classList.add('button')
+  form.appendChild(br)
+  form.appendChild(buttonText)
+  buttonText.addEventListener('click', e => {
+    const result = {
+      answer: ''
+    }
+    result.answer = inputText.value
+    postData(nextURL, result)
+    e.preventDefault()
+    form.removeChild(inputText)
+    timeLeft = 20
+    form.removeChild(buttonText)
+    form.removeChild(br)
+  })
 }
 function endGame () {
   console.log('Congrats you won')
@@ -210,20 +228,25 @@ function StartGame () {
   const start = document.createElement('button')
   start.classList.add('button')
   start.textContent = 'submit'
+  const br = document.createElement('br')
+
   const playerName = document.createElement('input')
   playerName.setAttribute('placeHolder', 'Name')
   playerName.setAttribute('id', 'playerName')
   form.appendChild(message)
   form.appendChild(playerName)
+  form.appendChild(br)
   form.appendChild(start)
   start.addEventListener('click', () => {
     playerNames.push(playerName.value)
-    getQuestion(1)
+    form.removeChild(br)
     form.removeChild(playerName)
     form.removeChild(start)
-    timerId = setInterval(countdown, 1000)
     form.removeChild(message)
+    getQuestion(1)
+    timerId = setInterval(countdown, 1000)
   })
 }
 
 StartGame()
+// getQuestion(1)
