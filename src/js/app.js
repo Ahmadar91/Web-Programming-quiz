@@ -173,11 +173,11 @@ function endGame () {
   gameOver.classList.add('red')
   body.appendChild(gameOver)
   clearTimeout(timerId)
-  // for (let i = 0; i < playerNames.length; i++) {
-  //   players = document.createElement('p')
-  //   players.textContent = '' + playerNames[i]
-  //   scoreBoard.appendChild(players)
-  // }
+  for (let i = 0; i < playerNames.length; i++) {
+    players = document.createElement('p')
+    players.textContent = '' + playerNames[i]
+    scoreBoard.appendChild(players)
+  }
 }
 
 // postData('http://vhost3.lnu.se:20080/answer/1', { answer: '2' })
@@ -205,18 +205,24 @@ function doSomething () {
 }
 
 function StartGame () {
+  const message = document.createElement('H3')
+  message.textContent = 'Enter you name to start'
   const start = document.createElement('button')
+  start.classList.add('button')
+  start.textContent = 'submit'
   const playerName = document.createElement('input')
   playerName.setAttribute('placeHolder', 'Name')
   playerName.setAttribute('id', 'playerName')
+  form.appendChild(message)
   form.appendChild(playerName)
   form.appendChild(start)
-  start.addEventListener('click', e => {
+  start.addEventListener('click', () => {
     playerNames.push(playerName.value)
     getQuestion(1)
     form.removeChild(playerName)
     form.removeChild(start)
     timerId = setInterval(countdown, 1000)
+    form.removeChild(message)
   })
 }
 

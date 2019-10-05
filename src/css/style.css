@@ -8,3 +8,17 @@
     font-size: 25px;
     color: red;
 }
+.button{
+    background-color: #ddd;
+    border: none;
+    color: black;
+    padding: 16px 32px;
+    text-align: center;
+    font-size: 16px;
+    margin: 4px 2px;
+    transition: 0.3s;
+}
+.button:hover{
+    background-color: #3e8e41;
+    color: white;
+}
