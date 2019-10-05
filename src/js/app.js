@@ -18,6 +18,7 @@ let nextURL = ''
 let newData = {
 
 }
+const timer = document.querySelector('#timer')
 
 /*
 fetch the question to the the server
@@ -82,12 +83,13 @@ async function postData (url, data = {}) {
 /*
 button submit
 */
-button.addEventListener('click', () => {
+button.addEventListener('click', e => {
   const result = {
     answer: ''
   }
   result.answer = inputText.value
   postData(nextURL, result)
+  e.preventDefault()
   removeTextInput()
 })
 function altQuestions () {
@@ -121,14 +123,22 @@ function altQuestions () {
       selectLabel[i].classList.remove('greenColor')
     })
 
-    selectLabel[i].addEventListener('click', () => {
+    selectAlt[i].addEventListener('click', () => {
       altResult.answer = selectAlt[i].getAttribute('id')
       console.log('TCL: altQuestions -> altResult.answer', altResult.answer)
-      postData(nextURL, altResult)
-      removeAltInput()
+      button.addEventListener('click', e => {
+        postData(nextURL, altResult)
+        removeAltInput()
+      })
     })
   }
 }
+// function submit (result) {
+//   button.addEventListener('click', e => {
+//     postData(nextURL, result)
+//     removeAltInput()
+//   })
+// }
 function removeAltInput () {
   while (form.hasChildNodes()) {
     form.removeChild(form.lastChild)
