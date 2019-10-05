@@ -2,7 +2,9 @@
 /*
 variables
 */
+
 const inputText = document.createElement('input')
+const body = document.querySelector('body')
 // const input = document.querySelector('#input')
 const button = document.querySelector('button')
 const questionSpan = document.querySelector('#question')
@@ -19,7 +21,9 @@ let newData = {
 
 }
 const timer = document.querySelector('#timer')
-
+let timeLeft = 20
+let timerId
+const playerNames = []
 /*
 fetch the question to the the server
 */
@@ -77,6 +81,7 @@ async function postData (url, data = {}) {
     console.log('TCL: postData -> res', res)
     getQuestion(res)
   }).catch(function (err) {
+    // endGame()
     console.log('Fetch Error :-S', err)
   })
 }
@@ -91,8 +96,10 @@ button.addEventListener('click', e => {
   postData(nextURL, result)
   e.preventDefault()
   removeTextInput()
+  timeLeft = 20
 })
 function altQuestions () {
+  countdown()
   radioArray = Object.values(newData.alternatives)
   for (let index = 0; index < radioArray.length; index++) {
     br = document.createElement('br')
@@ -129,6 +136,7 @@ function altQuestions () {
       button.addEventListener('click', e => {
         postData(nextURL, altResult)
         removeAltInput()
+        timeLeft = 20
       })
     })
   }
@@ -150,14 +158,66 @@ function removeTextInput () {
 }
 
 function textQuestions () {
+  countdown()
   inputText.setAttribute('type', 'text')
   const form = document.querySelector('#form')
   form.appendChild(inputText)
 }
 function endGame () {
   console.log('Congrats you won')
+  const gameOver = document.createElement('p')
+  gameOver.textContent = 'Game Over you Lost'
+  const scoreBoard = document.createElement('div')
+  scoreBoard.setAttribute('id', '#scoreBoard')
+  let players
+  gameOver.classList.add('red')
+  body.appendChild(gameOver)
+  clearTimeout(timerId)
+  // for (let i = 0; i < playerNames.length; i++) {
+  //   players = document.createElement('p')
+  //   players.textContent = '' + playerNames[i]
+  //   scoreBoard.appendChild(players)
+  // }
 }
-getQuestion(1)
+
 // postData('http://vhost3.lnu.se:20080/answer/1', { answer: '2' })
 // postData('http://vhost3.lnu.se:20080/answer/21', { answer: 'alt3' })
 // postData('http://vhost3.lnu.se:20080/answer/326', { answer: 'alt3' })
+
+function countdown () {
+  if (timeLeft === -1) {
+    clearTimeout(timerId)
+    doSomething()
+  } else {
+    timer.innerHTML = timeLeft + ' seconds remaining'
+    timeLeft--
+  }
+  if (timeLeft < 10) {
+    timer.classList.add('red')
+  }
+  if (timeLeft > 10) {
+    timer.classList.remove('red')
+  }
+}
+
+function doSomething () {
+  endGame()
+}
+
+function StartGame () {
+  const start = document.createElement('button')
+  const playerName = document.createElement('input')
+  playerName.setAttribute('placeHolder', 'Name')
+  playerName.setAttribute('id', 'playerName')
+  form.appendChild(playerName)
+  form.appendChild(start)
+  start.addEventListener('click', e => {
+    playerNames.push(playerName.value)
+    getQuestion(1)
+    form.removeChild(playerName)
+    form.removeChild(start)
+    timerId = setInterval(countdown, 1000)
+  })
+}
+
+StartGame()
