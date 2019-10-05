@@ -11,6 +11,7 @@ const form = document.querySelector('#form')
 radioQuestion.setAttribute('type', 'radio')
 let alt
 let br
+let radioArray
 let label
 radioQuestion.setAttribute('name', 'alt')
 let nextURL = ''
@@ -33,13 +34,17 @@ async function getQuestion (id) {
         // Examine the text in the response
         res.json().then(function (data) {
           console.log(data)
+
           questionSpan.textContent = data.question
           nextURL = data.nextURL
+
           newData = data
 
           if (typeof (newData.alternatives) !== 'undefined') {
             altQuestions()
-          } else { textQuestions() }
+          } else {
+            textQuestions()
+          }
           return data
         })
       }
@@ -81,13 +86,12 @@ button.addEventListener('click', () => {
   const result = {
     answer: ''
   }
-  // result.answer = input.value
   result.answer = inputText.value
   postData(nextURL, result)
-//  console.log('TCL: answer', result)
+  removeTextInput()
 })
 function altQuestions () {
-  const radioArray = Object.values(newData.alternatives)
+  radioArray = Object.values(newData.alternatives)
   for (let index = 0; index < radioArray.length; index++) {
     br = document.createElement('br')
     alt = document.createElement('input')
@@ -99,8 +103,6 @@ function altQuestions () {
     alt.textContent = radioArray[index]
     label.setAttribute('for', 'alt' + [index + 1])
     label.textContent = radioArray[index]
-    //        console.log('TCL: getQuestion -> label', label)
-    //         console.log('TCL: getQuestion -> alt', alt)
     form.appendChild(alt)
     form.append(label)
     form.appendChild(br)
@@ -123,9 +125,20 @@ function altQuestions () {
       altResult.answer = selectAlt[i].getAttribute('id')
       console.log('TCL: altQuestions -> altResult.answer', altResult.answer)
       postData(nextURL, altResult)
+      removeAltInput()
     })
   }
 }
+function removeAltInput () {
+  while (form.hasChildNodes()) {
+    form.removeChild(form.lastChild)
+  }
+}
+
+function removeTextInput () {
+  form.removeChild(inputText)
+}
+
 function textQuestions () {
   inputText.setAttribute('type', 'text')
   const form = document.querySelector('#form')
