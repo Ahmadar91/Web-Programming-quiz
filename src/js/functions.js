@@ -32,7 +32,7 @@ let timeLeft = 20
 let timerId
 const playerNames = []
 const gameOver = document.createElement('p')
-gameOver.textContent = 'Game Over you Lost'
+gameOver.textContent = 'Game Over'
 const scoreBoard = document.createElement('div')
 scoreBoard.setAttribute('id', '#scoreBoard')
 const orderList = document.createElement('ol')
@@ -140,34 +140,29 @@ function altQuestions () {
       // TODO:fix the post error from here
       buttonAlt.addEventListener('click', e => {
         postData(nextURL, altResult)
-        removeAltInput()
+        removeInput()
         timeLeft = 20
       })
     })
   }
 }
-// function submit (result) {
-//   button.addEventListener('click', e => {
-//     postData(nextURL, result)
-//     removeAltInput()
-//   })
-// }
-function removeAltInput () {
+
+function removeInput () {
   while (form.hasChildNodes()) {
     form.removeChild(form.lastChild)
   }
 }
-
+let buttonText
+let br1
 function textQuestions () {
   countdown()
   inputText.setAttribute('type', 'text')
-  const form = document.querySelector('#form')
   form.appendChild(inputText)
-  const buttonText = document.createElement('button')
-  const br = document.createElement('br')
+  buttonText = document.createElement('button')
+  br1 = document.createElement('br')
   buttonText.textContent = 'submit'
   buttonText.classList.add('button')
-  form.appendChild(br)
+  form.appendChild(br1)
   form.appendChild(buttonText)
   buttonText.addEventListener('click', e => {
     const result = {
@@ -179,13 +174,13 @@ function textQuestions () {
     form.removeChild(inputText)
     timeLeft = 20
     form.removeChild(buttonText)
-    form.removeChild(br)
+    form.removeChild(br1)
   })
 }
 function endGame () {
-  reset()
-  console.log('Congrats you won')
+  removeInput()
 
+  console.log('Congrats you won')
   let players
   gameOver.classList.add('red')
   body.appendChild(gameOver)
@@ -200,6 +195,7 @@ function endGame () {
   }
   scoreBoard.appendChild(orderList)
   body.appendChild(scoreBoard)
+  reset()
 }
 
 function countdown () {
@@ -237,8 +233,14 @@ export function StartGame () {
   form.appendChild(playerName)
   form.appendChild(br)
   form.appendChild(start)
+  const playerScore = {
+    name: '',
+    time: ''
+  }
+
   start.addEventListener('click', () => {
-    playerNames.push(playerName.value)
+    playerScore.name = playerName.value
+    playerNames.push(playerScore)
     form.removeChild(br)
     form.removeChild(playerName)
     form.removeChild(start)
