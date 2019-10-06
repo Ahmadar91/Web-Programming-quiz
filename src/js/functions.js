@@ -215,10 +215,12 @@ function countdown () {
 }
 
 function doSomething () {
+  console.log('doSomething')
   endGame()
 }
 
 export function StartGame () {
+  console.log('StartGame')
   const message = document.createElement('H3')
   message.textContent = 'Enter you name to start'
   const start = document.createElement('button')
@@ -248,11 +250,13 @@ export function StartGame () {
     body.insertBefore(pQuestions, form)
     body.insertBefore(pTimer, form)
     getQuestion(1)
+    timeLeft = 20
     timerId = setInterval(countdown, 1000)
   })
 }
 
 function reset () {
+  console.log('reset')
   const message = document.createElement('h3')
   message.textContent = 'click on the reset button to start again'
   form.appendChild(message)
