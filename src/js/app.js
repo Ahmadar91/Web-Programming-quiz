@@ -4,8 +4,17 @@ variables
 */
 
 const inputText = document.createElement('input')
+//
+const pQuestions = document.createElement('p')
+const pTimer = document.createElement('p')
+const spanTimer = document.createElement('span')
+const spanQuestion = document.createElement('span')
+spanQuestion.setAttribute('id', 'question')
+spanTimer.setAttribute('id', 'timer')
+pTimer.appendChild(spanTimer)
+pQuestions.appendChild(spanQuestion)
 const body = document.querySelector('body')
-const questionSpan = document.querySelector('#question')
+// const questionSpan = document.querySelector('#question')
 const radioQuestion = document.createElement('input')
 const form = document.querySelector('#form')
 radioQuestion.setAttribute('type', 'radio')
@@ -18,10 +27,14 @@ let nextURL = ''
 let newData = {
 
 }
-const timer = document.querySelector('#timer')
+// const timer = document.querySelector('#timer')
 let timeLeft = 20
 let timerId
 const playerNames = []
+const gameOver = document.createElement('p')
+gameOver.textContent = 'Game Over you Lost'
+const scoreBoard = document.createElement('div')
+scoreBoard.setAttribute('id', '#scoreBoard')
 /*
 fetch the question to the the server
 */
@@ -38,7 +51,8 @@ async function getQuestion (id) {
         res.json().then(function (data) {
           console.log(data)
 
-          questionSpan.textContent = data.question
+          // questionSpan.textContent = data.question
+          spanQuestion.textContent = data.question
           nextURL = data.nextURL
 
           newData = data
@@ -169,14 +183,13 @@ function textQuestions () {
 function endGame () {
   reset()
   console.log('Congrats you won')
-  const gameOver = document.createElement('p')
-  gameOver.textContent = 'Game Over you Lost'
-  const scoreBoard = document.createElement('div')
-  scoreBoard.setAttribute('id', '#scoreBoard')
+
   let players
   gameOver.classList.add('red')
   body.appendChild(gameOver)
   clearTimeout(timerId)
+  body.removeChild(pQuestions)
+  body.removeChild(pTimer)
   for (let i = 0; i < playerNames.length; i++) {
     players = document.createElement('p')
     players.textContent = '' + playerNames[i]
@@ -193,14 +206,14 @@ function countdown () {
     clearTimeout(timerId)
     doSomething()
   } else {
-    timer.innerHTML = timeLeft + ' seconds remaining'
+    spanTimer.innerHTML = timeLeft + ' seconds remaining'
     timeLeft--
   }
   if (timeLeft < 10) {
-    timer.classList.add('red')
+    spanTimer.classList.add('red')
   }
   if (timeLeft > 10) {
-    timer.classList.remove('red')
+    spanTimer.classList.remove('red')
   }
 }
 
@@ -219,6 +232,9 @@ function StartGame () {
   const playerName = document.createElement('input')
   playerName.setAttribute('placeHolder', 'Name')
   playerName.setAttribute('id', 'playerName')
+  // body.insertBefore.(pQuestions, form)
+  // body.insertBefore.(pTimer, form)
+
   form.appendChild(message)
   form.appendChild(playerName)
   form.appendChild(br)
@@ -229,6 +245,8 @@ function StartGame () {
     form.removeChild(playerName)
     form.removeChild(start)
     form.removeChild(message)
+    body.insertBefore(pQuestions, form)
+    body.insertBefore(pTimer, form)
     getQuestion(1)
     timerId = setInterval(countdown, 1000)
   })
@@ -245,9 +263,15 @@ function reset () {
   resetButton.classList.add('button')
   resetButton.textContent = 'Reset'
   form.appendChild(resetButton)
+  body.removeChild(pQuestions)
+  body.removeChild(pTimer)
+
   resetButton.addEventListener('click', () => {
     form.removeChild(resetButton)
     form.removeChild(message)
+    body.removeChild(gameOver)
+    // body.removeChild(pQuestions)
+    // body.removeChild(pTimer)
     StartGame()
   })
 }
