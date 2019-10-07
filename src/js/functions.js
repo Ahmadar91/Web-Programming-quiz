@@ -38,6 +38,8 @@ let timerId
 const playerNames = []
 const gameOver = document.createElement('p')
 gameOver.textContent = 'Game Over'
+const gameWon = document.createElement('p')
+gameWon.textContent = 'Congrats you Won'
 const scoreBoard = document.createElement('div')
 scoreBoard.setAttribute('id', '#scoreBoard')
 const orderList = document.createElement('ol')
@@ -62,9 +64,7 @@ async function getQuestion (id) {
           // questionSpan.textContent = data.question
           spanQuestion.textContent = data.question
           nextURL = data.nextURL
-
           newData = data
-
           if (typeof (newData.alternatives) !== 'undefined') {
             altQuestions()
           } else {
@@ -90,20 +90,38 @@ async function postData (url, data = {}) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(data)
-  }).then(el => el.json()).then(data => {
-    const str = data.nextURL
-    if (str == null) {
-      endGame()
-      return
+  }).then(
+    function (res) {
+      if (res.status !== 200) {
+        console.log('Looks like there was a problem. Status Code: ' +
+         res.status)
+        endGame()
+        console.log('ahmad')
+
+        return
+      }
+      res.json().then(data => {
+        console.log('ahmad')
+
+        const str = data.nextURL
+        if (str == null) {
+          console.log('ahmad')
+
+          GameWon()
+          return
+        }
+        const res = str.slice(36, str.length)
+        console.log(data)
+        console.log('TCL: postData -> res', res)
+        getQuestion(res)
+      })
     }
-    const res = str.slice(36, str.length)
-    console.log(data)
-    console.log('TCL: postData -> res', res)
-    getQuestion(res)
-  }).catch(function (err) {
+  )
+    .catch(function (err) {
     // endGame()
-    console.log('Fetch Error :-S', err)
-  })
+
+      console.log('Fetch Error :-S', err)
+    })
 }
 function altQuestions () {
   countdown()
@@ -144,13 +162,16 @@ function altQuestions () {
       altResult.answer = selectAlt[i].getAttribute('id')
       console.log('TCL: altQuestions -> altResult.answer', altResult.answer)
       // TODO:fix the post error from here
-      buttonAlt.addEventListener('click', e => {
-        postData(nextURL, altResult)
-        removeInput()
-        timeLeft = 20
-      })
     })
   }
+  buttonAlt.addEventListener('click', e => {
+    // if (altResult === undefined) {
+    //   gameOver()
+    // }
+    postData(nextURL, altResult)
+    removeInput()
+    timeLeft = 20
+  })
 }
 
 function removeInput () {
@@ -210,6 +231,32 @@ function endGame () {
   reset()
 }
 
+function GameWon () {
+  removeInput()
+  playerScore.time = totalTime
+  localStorage.setItem(playerScore.name, playerScore.time)
+  console.log('Congrats you wonaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+  let players
+  gameOver.classList.add('greenColor')
+  body.appendChild(gameWon)
+  yourScore.textContent = 'your Score is:  Name: ' + playerScore.name + ' time: ' + playerScore.time + ' Second(s)'
+  body.appendChild(yourScore)
+  clearTimeout(timerId)
+  body.removeChild(pQuestions)
+  body.removeChild(pTimer)
+
+  for (let i = 0; i < 5; i++) {
+    players = document.createElement('li')
+    // players.textContent = 'Name: ' + playerNames[i] + ' Time: ' + playerNames[i]
+    players.textContent = 'Name: ' + playerNames[i] + ' Time: ' + playerNames[i]
+    orderList.appendChild(players)
+  }
+  scoreBoard.textContent = 'Top 5'
+  scoreBoard.appendChild(orderList)
+  body.appendChild(scoreBoard)
+  reset()
+}
+
 function countdown () {
   if (timeLeft === -1) {
     clearTimeout(timerId)
@@ -242,8 +289,10 @@ export function StartGame () {
   const br = document.createElement('br')
 
   const playerName = document.createElement('input')
+  playerName.setAttribute('type', 'text')
   playerName.setAttribute('placeHolder', 'Name')
   playerName.setAttribute('id', 'playerName')
+  playerName.required = true
   form.appendChild(message)
   form.appendChild(playerName)
   form.appendChild(br)
