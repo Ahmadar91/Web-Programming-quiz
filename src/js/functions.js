@@ -27,6 +27,11 @@ let nextURL = ''
 let newData = {
 
 }
+let totalTime
+const playerScore = {
+  name: '',
+  time: ''
+}
 // const timer = document.querySelector('#timer')
 let timeLeft = 20
 let timerId
@@ -37,6 +42,7 @@ const scoreBoard = document.createElement('div')
 scoreBoard.setAttribute('id', '#scoreBoard')
 const orderList = document.createElement('ol')
 scoreBoard.setAttribute('id', '#ol')
+const yourScore = document.createElement('p')
 /*
 fetch the question to the the server
 */
@@ -179,20 +185,26 @@ function textQuestions () {
 }
 function endGame () {
   removeInput()
-
+  playerScore.time = totalTime
+  console.log('TCL: endGame -> playerScore', playerScore)
+  localStorage.setItem(playerScore.name, playerScore.time)
   console.log('Congrats you won')
   let players
   gameOver.classList.add('red')
   body.appendChild(gameOver)
+  yourScore.textContent = 'your Score is:  Name: ' + playerScore.name + ' time: ' + playerScore.time + ' Second(s)'
+  body.appendChild(yourScore)
   clearTimeout(timerId)
   body.removeChild(pQuestions)
   body.removeChild(pTimer)
 
   for (let i = 0; i < 5; i++) {
     players = document.createElement('li')
-    players.textContent = '' + playerNames[i]
+    // players.textContent = 'Name: ' + playerNames[i] + ' Time: ' + playerNames[i]
+    players.textContent = 'Name: ' + playerNames[i] + ' Time: ' + playerNames[i]
     orderList.appendChild(players)
   }
+  scoreBoard.textContent = 'Top 5'
   scoreBoard.appendChild(orderList)
   body.appendChild(scoreBoard)
   reset()
@@ -205,6 +217,7 @@ function countdown () {
   } else {
     spanTimer.innerHTML = timeLeft + ' seconds remaining'
     timeLeft--
+    totalTime++
   }
   if (timeLeft < 10) {
     spanTimer.classList.add('red')
@@ -235,13 +248,9 @@ export function StartGame () {
   form.appendChild(playerName)
   form.appendChild(br)
   form.appendChild(start)
-  const playerScore = {
-    name: '',
-    time: ''
-  }
-
   start.addEventListener('click', () => {
     playerScore.name = playerName.value
+    console.log('TCL: StartGame ->   playerScore.name', playerScore.name)
     playerNames.push(playerScore)
     form.removeChild(br)
     form.removeChild(playerName)
@@ -249,9 +258,10 @@ export function StartGame () {
     form.removeChild(message)
     body.insertBefore(pQuestions, form)
     body.insertBefore(pTimer, form)
-    getQuestion(1)
     timeLeft = 20
     timerId = setInterval(countdown, 1000)
+    getQuestion(1)
+    totalTime = 0
   })
 }
 
@@ -268,6 +278,10 @@ function reset () {
     form.removeChild(resetButton)
     form.removeChild(message)
     body.removeChild(gameOver)
+    body.removeChild(yourScore)
+    while (orderList.hasChildNodes()) {
+      orderList.removeChild(orderList.lastChild)
+    }
     scoreBoard.removeChild(orderList)
     body.removeChild(scoreBoard)
     StartGame()
