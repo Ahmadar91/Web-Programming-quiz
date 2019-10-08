@@ -35,7 +35,7 @@ const playerScore = {
 // const timer = document.querySelector('#timer')
 let timeLeft = 20
 let timerId
-const playerNames = []
+let playerNames = []
 const gameOver = document.createElement('p')
 gameOver.textContent = 'Game Over'
 const gameWon = document.createElement('p')
@@ -91,35 +91,30 @@ async function postData (url, data = {}) {
     },
     body: JSON.stringify(data)
   }).then(
-    function (res) {
+    async function (res) {
       if (res.status !== 200) {
         console.log('Looks like there was a problem. Status Code: ' +
          res.status)
         endGame()
         console.log('ahmad')
-
         return
       }
-      res.json().then(data => {
+      data = await res.json()
+      console.log('ahmad')
+      const str = data.nextURL
+      if (str == null) {
         console.log('ahmad')
-
-        const str = data.nextURL
-        if (str == null) {
-          console.log('ahmad')
-
-          GameWon()
-          return
-        }
-        const res = str.slice(36, str.length)
-        console.log(data)
-        console.log('TCL: postData -> res', res)
-        getQuestion(res)
-      })
+        GameWon()
+        return
+      }
+      res = str.slice(36, str.length)
+      console.log(data)
+      console.log('TCL: postData -> res', res)
+      getQuestion(res)
     }
   )
     .catch(function (err) {
     // endGame()
-
       console.log('Fetch Error :-S', err)
     })
 }
@@ -207,10 +202,6 @@ function textQuestions () {
 function endGame () {
   removeInput()
   playerScore.time = totalTime
-  console.log('TCL: endGame -> playerScore', playerScore)
-  localStorage.setItem(playerScore.name, playerScore.time)
-  console.log('Congrats you won')
-  let players
   gameOver.classList.add('red')
   body.appendChild(gameOver)
   yourScore.textContent = 'your Score is:  Name: ' + playerScore.name + ' time: ' + playerScore.time + ' Second(s)'
@@ -218,43 +209,56 @@ function endGame () {
   clearTimeout(timerId)
   body.removeChild(pQuestions)
   body.removeChild(pTimer)
-
-  for (let i = 0; i < 5; i++) {
-    players = document.createElement('li')
-    // players.textContent = 'Name: ' + playerNames[i] + ' Time: ' + playerNames[i]
-    players.textContent = 'Name: ' + playerNames[i] + ' Time: ' + playerNames[i]
-    orderList.appendChild(players)
-  }
-  scoreBoard.textContent = 'Top 5'
-  scoreBoard.appendChild(orderList)
-  body.appendChild(scoreBoard)
-  reset()
+  resetGameOVer()
 }
-
 function GameWon () {
   removeInput()
   playerScore.time = totalTime
-  localStorage.setItem(playerScore.name, playerScore.time)
-  console.log('Congrats you wonaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+  console.log('TCL: endGame -> playerScore', playerScore)
+  console.log('Congrats you won')
   let players
-  gameOver.classList.add('greenColor')
+  playerNames = load()
+  if (playerNames == null) {
+    playerNames = [playerScore]
+  } else {
+    if (getPosition(playerNames) < 5) {
+      playerNames.push(playerScore)
+      playerNames.sort(function (a, b) {
+        return a.time - b.time
+      })
+      if (playerNames.length > 5) {
+        playerNames.splice(5, playerNames.length - 5)
+      }
+    }
+  }
+  window.localStorage.setItem('playerNames', JSON.stringify(playerNames))
   body.appendChild(gameWon)
   yourScore.textContent = 'your Score is:  Name: ' + playerScore.name + ' time: ' + playerScore.time + ' Second(s)'
   body.appendChild(yourScore)
   clearTimeout(timerId)
   body.removeChild(pQuestions)
   body.removeChild(pTimer)
-
-  for (let i = 0; i < 5; i++) {
+  playerNames.forEach(function (element) {
     players = document.createElement('li')
-    // players.textContent = 'Name: ' + playerNames[i] + ' Time: ' + playerNames[i]
-    players.textContent = 'Name: ' + playerNames[i] + ' Time: ' + playerNames[i]
+    players.textContent = 'Name: ' + element.name + ' Time: ' + element.time + ' Second(s)'
     orderList.appendChild(players)
-  }
+  })
   scoreBoard.textContent = 'Top 5'
   scoreBoard.appendChild(orderList)
   body.appendChild(scoreBoard)
   reset()
+}
+
+function getPosition (array) {
+  let pos = 1
+  array.forEach(function (element) {
+    if (playerScore.time < element.time) pos++
+  })
+  return pos
+}
+
+function load () {
+  return JSON.parse(window.localStorage.getItem('playerNames'))
 }
 
 function countdown () {
@@ -326,13 +330,30 @@ function reset () {
   resetButton.addEventListener('click', () => {
     form.removeChild(resetButton)
     form.removeChild(message)
-    body.removeChild(gameOver)
+    body.removeChild(gameWon)
     body.removeChild(yourScore)
     while (orderList.hasChildNodes()) {
       orderList.removeChild(orderList.lastChild)
     }
     scoreBoard.removeChild(orderList)
     body.removeChild(scoreBoard)
+    StartGame()
+  })
+}
+function resetGameOVer () {
+  console.log('reset')
+  const message = document.createElement('h3')
+  message.textContent = 'click on the reset button to start again'
+  form.appendChild(message)
+  const resetButton = document.createElement('button')
+  resetButton.classList.add('button')
+  resetButton.textContent = 'Reset'
+  form.appendChild(resetButton)
+  resetButton.addEventListener('click', () => {
+    form.removeChild(resetButton)
+    form.removeChild(message)
+    body.removeChild(gameOver)
+    body.removeChild(yourScore)
     StartGame()
   })
 }
