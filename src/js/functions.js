@@ -4,7 +4,7 @@ variables
 */
 
 const inputText = document.createElement('input')
-//
+
 const pQuestions = document.createElement('p')
 const pTimer = document.createElement('p')
 const spanTimer = document.createElement('span')
@@ -14,7 +14,6 @@ spanTimer.setAttribute('id', 'timer')
 pTimer.appendChild(spanTimer)
 pQuestions.appendChild(spanQuestion)
 const body = document.querySelector('body')
-// const questionSpan = document.querySelector('#question')
 const radioQuestion = document.createElement('input')
 const form = document.querySelector('#form')
 radioQuestion.setAttribute('type', 'radio')
@@ -32,7 +31,6 @@ const playerScore = {
   name: '',
   time: ''
 }
-// const timer = document.querySelector('#timer')
 let timeLeft = 20
 let timerId
 let playerNames = []
@@ -114,7 +112,6 @@ async function postData (url, data = {}) {
     }
   )
     .catch(function (err) {
-    // endGame()
       console.log('Fetch Error :-S', err)
     })
 }
@@ -159,10 +156,7 @@ function altQuestions () {
       // TODO:fix the post error from here
     })
   }
-  buttonAlt.addEventListener('click', e => {
-    // if (altResult === undefined) {
-    //   gameOver()
-    // }
+  buttonAlt.addEventListener('click', () => {
     postData(nextURL, altResult)
     removeInput()
     timeLeft = 20
