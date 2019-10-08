@@ -38,11 +38,15 @@ const gameOver = document.createElement('p')
 gameOver.textContent = 'Game Over'
 const gameWon = document.createElement('p')
 gameWon.textContent = 'Congrats you Won'
+gameWon.classList.add('wonGame')
 const scoreBoard = document.createElement('div')
 scoreBoard.setAttribute('id', '#scoreBoard')
 const orderList = document.createElement('ol')
+const top5 = document.createElement('p')
 scoreBoard.setAttribute('id', '#ol')
 const yourScore = document.createElement('p')
+let buttonText
+let br1
 /*
 fetch the question to the the server
 */
@@ -55,11 +59,7 @@ async function getQuestion (id) {
            res.status)
           return
         }
-        // Examine the text in the response
         res.json().then(function (data) {
-          console.log(data)
-
-          // questionSpan.textContent = data.question
           spanQuestion.textContent = data.question
           nextURL = data.nextURL
           newData = data
@@ -94,20 +94,15 @@ async function postData (url, data = {}) {
         console.log('Looks like there was a problem. Status Code: ' +
          res.status)
         endGame()
-        console.log('ahmad')
         return
       }
       data = await res.json()
-      console.log('ahmad')
       const str = data.nextURL
       if (str == null) {
-        console.log('ahmad')
         GameWon()
         return
       }
       res = str.slice(36, str.length)
-      console.log(data)
-      console.log('TCL: postData -> res', res)
       getQuestion(res)
     }
   )
@@ -115,6 +110,9 @@ async function postData (url, data = {}) {
       console.log('Fetch Error :-S', err)
     })
 }
+/*
+alternative questions
+ */
 function altQuestions () {
   countdown()
   radioArray = Object.values(newData.alternatives)
@@ -127,6 +125,7 @@ function altQuestions () {
     alt.setAttribute('id', 'alt' + [index + 1])
     alt.setAttribute('value', '' + radioArray[index])
     alt.textContent = radioArray[index]
+    alt.classList.add('alt')
     label.setAttribute('for', 'alt' + [index + 1])
     label.textContent = radioArray[index]
     form.appendChild(alt)
@@ -152,8 +151,6 @@ function altQuestions () {
 
     selectAlt[i].addEventListener('click', () => {
       altResult.answer = selectAlt[i].getAttribute('id')
-      console.log('TCL: altQuestions -> altResult.answer', altResult.answer)
-      // TODO:fix the post error from here
     })
   }
   buttonAlt.addEventListener('click', () => {
@@ -162,18 +159,23 @@ function altQuestions () {
     timeLeft = 20
   })
 }
-
+/*
+remove input
+ */
 function removeInput () {
   while (form.hasChildNodes()) {
     form.removeChild(form.lastChild)
   }
 }
-let buttonText
-let br1
+/*
+text questions
+ */
 function textQuestions () {
   countdown()
   inputText.setAttribute('type', 'text')
+
   form.appendChild(inputText)
+  inputText.required = true
   buttonText = document.createElement('button')
   br1 = document.createElement('br')
   buttonText.textContent = 'submit'
@@ -187,12 +189,18 @@ function textQuestions () {
     result.answer = inputText.value
     postData(nextURL, result)
     e.preventDefault()
+    if (inputText.value !== '') {
+      inputText.value = ''
+    }
     form.removeChild(inputText)
     timeLeft = 20
     form.removeChild(buttonText)
     form.removeChild(br1)
   })
 }
+/*
+end game when game over
+ */
 function endGame () {
   removeInput()
   playerScore.time = totalTime
@@ -205,11 +213,12 @@ function endGame () {
   body.removeChild(pTimer)
   resetGameOVer()
 }
+/*
+end game when winning the game
+ */
 function GameWon () {
   removeInput()
   playerScore.time = totalTime
-  console.log('TCL: endGame -> playerScore', playerScore)
-  console.log('Congrats you won')
   let players
   playerNames = load()
   if (playerNames == null) {
@@ -217,7 +226,7 @@ function GameWon () {
   } else {
     if (getPosition(playerNames) < 5) {
       playerNames.push(playerScore)
-      playerNames.sort(function (a, b) {
+      playerNames.sort((a, b) => {
         return a.time - b.time
       })
       if (playerNames.length > 5) {
@@ -227,34 +236,44 @@ function GameWon () {
   }
   window.localStorage.setItem('playerNames', JSON.stringify(playerNames))
   body.appendChild(gameWon)
-  yourScore.textContent = 'your Score is:  Name: ' + playerScore.name + ' time: ' + playerScore.time + ' Second(s)'
+  yourScore.textContent = 'your Score is:  Name: ' + playerScore.name + '         Time: ' + playerScore.time + ' Second(s)'
   body.appendChild(yourScore)
   clearTimeout(timerId)
   body.removeChild(pQuestions)
   body.removeChild(pTimer)
   playerNames.forEach(function (element) {
     players = document.createElement('li')
-    players.textContent = 'Name: ' + element.name + ' Time: ' + element.time + ' Second(s)'
+    players.textContent = 'Name: ' + element.name + '         Time: ' + element.time + ' Second(s)'
     orderList.appendChild(players)
   })
-  scoreBoard.textContent = 'Top 5'
+  top5.textContent = 'Top 5'
+  top5.classList.add('size')
+  orderList.classList.add('orderList')
+  scoreBoard.appendChild(top5)
   scoreBoard.appendChild(orderList)
   body.appendChild(scoreBoard)
   reset()
 }
 
+/*
+Check current player time and return index
+ */
 function getPosition (array) {
   let pos = 1
-  array.forEach(function (element) {
+  array.forEach(element => {
     if (playerScore.time < element.time) pos++
   })
   return pos
 }
-
+/*
+load the local storage
+ */
 function load () {
   return JSON.parse(window.localStorage.getItem('playerNames'))
 }
-
+/*
+timer counter
+ */
 function countdown () {
   if (timeLeft === -1) {
     clearTimeout(timerId)
@@ -271,14 +290,16 @@ function countdown () {
     spanTimer.classList.remove('red')
   }
 }
-
+/*
+end game when time finish
+ */
 function doSomething () {
-  console.log('doSomething')
   endGame()
 }
-
+/*
+start the game
+ */
 export function StartGame () {
-  console.log('StartGame')
   const message = document.createElement('H3')
   message.textContent = 'Enter you name to start'
   const start = document.createElement('button')
@@ -287,17 +308,18 @@ export function StartGame () {
   const br = document.createElement('br')
 
   const playerName = document.createElement('input')
+  playerName.setAttribute('id', 'playerName')
   playerName.setAttribute('type', 'text')
   playerName.setAttribute('placeHolder', 'Name')
-  playerName.setAttribute('id', 'playerName')
+
   playerName.required = true
+  playerName.setAttribute('minLength', '1')
   form.appendChild(message)
   form.appendChild(playerName)
   form.appendChild(br)
   form.appendChild(start)
   start.addEventListener('click', () => {
     playerScore.name = playerName.value
-    console.log('TCL: StartGame ->   playerScore.name', playerScore.name)
     playerNames.push(playerScore)
     form.removeChild(br)
     form.removeChild(playerName)
@@ -311,9 +333,10 @@ export function StartGame () {
     totalTime = 0
   })
 }
-
+/*
+reset for winning the game
+ */
 function reset () {
-  console.log('reset')
   const message = document.createElement('h3')
   message.textContent = 'click on the reset button to start again'
   form.appendChild(message)
@@ -329,13 +352,16 @@ function reset () {
     while (orderList.hasChildNodes()) {
       orderList.removeChild(orderList.lastChild)
     }
+    scoreBoard.removeChild(top5)
     scoreBoard.removeChild(orderList)
     body.removeChild(scoreBoard)
     StartGame()
   })
 }
+/*
+reset for game over
+ */
 function resetGameOVer () {
-  console.log('reset')
   const message = document.createElement('h3')
   message.textContent = 'click on the reset button to start again'
   form.appendChild(message)
